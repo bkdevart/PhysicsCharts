@@ -82,17 +82,6 @@ class UIJoin: ObservableObject {
     @Published var lastNode = SKNode()
     @Published var jumpStrength = 0.25
     @Published var lastNodeSpeed = 0.0
-//    {
-//        willSet(newLastNodeSpeed) {
-//            print("Current speed: \(lastNodeSpeed)")
-//            print("About to set speed: \(newLastNodeSpeed)")
-//        }
-//        didSet {
-//            if lastNodeSpeed > oldValue  {
-//                print("Added \(lastNodeSpeed - oldValue) steps")
-//            }
-//        }
-//    }
     
     public func jumpNodeRight() {
         // applyImpulse
@@ -209,7 +198,7 @@ class UIJoin: ObservableObject {
             print("Pregancies[0]: ", decodedData[0].Pregnancies)
             print("Outcome[0]: ", decodedData[0].Outcome)
             print("===================================")
-            // TODO: push to shared object
+            // push to shared object
             self.pima = decodedData
         } catch {
             print("decode error")
@@ -243,7 +232,6 @@ func createFeatureNodeShape(shape: Shape, scale: Float, chosenColor: Color, loca
     switch shape {
     case .data:
         // TODO: this is a hack to satisify requirement of returning node, it's handled in createFeatureNode function - fix
-        
         return SKShapeNode()
 
     case .rectangle:
@@ -262,16 +250,14 @@ func createFeatureNodeShape(shape: Shape, scale: Float, chosenColor: Color, loca
         box.strokeColor = UIColor(chosenColor)
         box.position = location
         box.zPosition = CGFloat(0)
-        if hasPhysics {
-            box.physicsBody = SKPhysicsBody(polygonFrom: path)
-            // default density value is 1.0, anything higher is relative to this
-            box.physicsBody?.density = controls.density
-            // TODO: figure out how to add in mass control while factoring in density
-            
-            // modify static/dynamic property based on toggle
-            box.physicsBody?.isDynamic = !controls.staticNode
-            box.physicsBody?.linearDamping = controls.linearDamping
-        }
+        box.physicsBody = SKPhysicsBody(polygonFrom: path)
+        // default density value is 1.0, anything higher is relative to this
+        box.physicsBody?.density = controls.density
+        // TODO: figure out how to add in mass control while factoring in density
+        
+        // modify static/dynamic property based on toggle
+        box.physicsBody?.isDynamic = !controls.staticNode
+        box.physicsBody?.linearDamping = controls.linearDamping
         return box
     }
     
@@ -311,6 +297,22 @@ func createFeatureNode(text: String, scale: Float, chosenColor: Color, location:
     return myText
 }
 
+func renderBox(boxWidth: Int, boxHeight: Int, chosenColor: Color, location: CGPoint, zPosition: Int) -> SKNode {
+    let path = CGMutablePath()
+    let box_half = Int(boxWidth) / 2
+    path.move(to: CGPoint(x: -box_half, y: Int(boxHeight)))  // upper left corner
+    path.addLine(to: CGPoint(x: box_half, y: Int(boxHeight)))  // upper right corner
+    path.addLine(to: CGPoint(x: box_half, y: 0)) // bottom right corner
+    path.addLine(to: CGPoint(x: -box_half, y: 0))  // bottom left corner
+    let box = SKShapeNode(path: path)
+    box.fillColor = UIColor(chosenColor)
+    box.strokeColor = UIColor(chosenColor)
+    box.position = location
+    box.zPosition = CGFloat(zPosition)
+    box.physicsBody = SKPhysicsBody(polygonFrom: path)
+    return box
+}
+
 func renderNode(location: CGPoint,
                 hasPhysics: Bool=false,
                 zPosition: Int=0,
@@ -322,8 +324,8 @@ func renderNode(location: CGPoint,
     
     controls.nodeCount += 1
     // user can choose height and width
-    let boxWidth = Int((controls.boxWidth / 100.0) * Double(controls.scalePixels))
-    let boxHeight = Int((controls.boxHeight / 100.0) * Double(controls.scalePixels))
+    var boxWidth = Int((controls.boxWidth / 100.0) * Double(controls.scalePixels))
+    var boxHeight = Int((controls.boxHeight / 100.0) * Double(controls.scalePixels))
     // each color betwen 0 and 1 (based on slider)
     let chosenColor: Color = Color(red: lastRed,
                                    green: lastGreen,
@@ -332,32 +334,31 @@ func renderNode(location: CGPoint,
     controls.selectedNode = SKNode()
     switch controls.selectedShape {
     case .data:
-        // TODO: this is a hack to satisify requirement of returning node, it's handled in createFeatureNode function - fix
+        // TODO: process data and stack all 768 datapoints
+        // sum up counts of each outcome, make hight of rectangle based on this, drop two rectangles
+        var totalOutcome1 = 0
+        var totalOutcome0 = 0
+
+        for patient in controls.pima {
+            if patient.Outcome == 1 {
+                totalOutcome1 += 1
+            } else if patient.Outcome == 0 {
+                totalOutcome0 += 1
+            }
+        }
         
-        return SKNode()
+        // scale rectangle around outcome counts (must pick larger count, statically setting to 0 for now)
+        boxWidth = boxWidth / 3
+        let totalOutcome1Ratio = (Float(totalOutcome1) / Float(controls.pima.count)) * Float(controls.screenHeight)
+        
+        boxHeight = Int(totalOutcome1Ratio)
+        print(totalOutcome1Ratio)
+        
+        let box = renderBox(boxWidth: boxWidth, boxHeight: boxHeight, chosenColor: chosenColor, location: location, zPosition: zPosition)
+        return box
 
     case .rectangle:
-        let path = CGMutablePath()
-        let box_half = Int(boxWidth) / 2
-        path.move(to: CGPoint(x: -box_half, y: Int(boxHeight)))  // upper left corner
-        path.addLine(to: CGPoint(x: box_half, y: Int(boxHeight)))  // upper right corner
-        path.addLine(to: CGPoint(x: box_half, y: 0)) // bottom right corner
-        path.addLine(to: CGPoint(x: -box_half, y: 0))  // bottom left corner
-        let box = SKShapeNode(path: path)
-        box.fillColor = UIColor(chosenColor)
-        box.strokeColor = UIColor(chosenColor)
-        box.position = location
-        box.zPosition = CGFloat(zPosition)
-        if hasPhysics {
-            box.physicsBody = SKPhysicsBody(polygonFrom: path)
-            // default density value is 1.0, anything higher is relative to this
-            box.physicsBody?.density = controls.density
-            // TODO: figure out how to add in mass control while factoring in density
-            
-            // modify static/dynamic property based on toggle
-            box.physicsBody?.isDynamic = !controls.staticNode
-            box.physicsBody?.linearDamping = controls.linearDamping
-        }
+        let box = renderBox(boxWidth: boxWidth, boxHeight: boxHeight, chosenColor: chosenColor, location: location, zPosition: zPosition)
         return box
     }
 }

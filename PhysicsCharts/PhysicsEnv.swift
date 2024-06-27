@@ -98,29 +98,16 @@ class GameScene: SKScene {
          Specifically, it sets the physics body for the scene to be an edge loop with a certain size and a camera origin at the center. It also adds gesture recognizers for pinch zooming the camera, panning the camera, and moving the scene on the screen with three fingers. Lastly, it increments a variable timesAppLoaded to keep track of how many times the app has been loaded.
         */
         // initialize physics environment
-//        let defaults = UserDefaults.standard
         timesAppLoaded += 1
-        // playview will be mulitiplied by screenMultiply
-        
-        // TODO: see if scene should be loaded here
-        guard let physicsBody = SKScene(fileNamed: "TestScene2") else {
-            let screenSizeX = 428.0  // dynamically do this later
-            let physicsSize = screenSizeX * controls.physicsEnvScale
-            let cameraOrigin = CGPoint(x: 0, y: 0)  // x was (physicsSize / 2)
-            controls.cameraOrigin = cameraOrigin
-            let physicsZone = CGRect(origin: cameraOrigin,
-                                     size: CGSize(width: physicsSize,
-                                                  height: physicsSize))
-            // TODO: figure out how to put an outline around edgeLoop
-            physicsBody = SKPhysicsBody(edgeLoopFrom: physicsZone)
-            return
-        }
-        
-        // not using this, keeping in case a use appears
-//        let swipeRight = UISwipeGestureRecognizer(target: self,
-//            action: #selector(GameScene.swipeRight(sender:)))
-//        swipeRight.direction = .right
-//        view.addGestureRecognizer(swipeRight)
+        let screenSizeX = 428.0  // dynamically do this later
+        let physicsSize = screenSizeX * controls.physicsEnvScale
+        let cameraOrigin = CGPoint(x: 0, y: 0)  // x was (physicsSize / 2)
+        controls.cameraOrigin = cameraOrigin
+        let physicsZone = CGRect(origin: cameraOrigin,
+                                 size: CGSize(width: physicsSize,
+                                              height: physicsSize))
+        physicsBody = SKPhysicsBody(edgeLoopFrom: physicsZone)
+
         
         // adding pinch recgonizer for camera zoom
         let pinch = UIPinchGestureRecognizer(target: self, action: #selector(GameScene.pinchDetected(sender:)))
@@ -138,12 +125,6 @@ class GameScene: SKScene {
         moveScreen.maximumNumberOfTouches = 3
         view.addGestureRecognizer(moveScreen)
     }
-    
-    // not using this, keeping in case a use appears
-//    @objc func swipeRight(sender: UISwipeGestureRecognizer) {
-//        // Handle the swipe
-//        print("Swiped right!")
-//    }
     
     @objc func pinchDetected(sender: UIPinchGestureRecognizer) {
         /**
@@ -279,13 +260,7 @@ class GameScene: SKScene {
         guard let touch = touches.first else { return }
         let location = touch.location(in: self)
         let touchedNodes = nodes(at: location)
-        
-        if !controls.isPainting {
-            handleNonPaintingTouchesEnded(touchedNodes, location)
-        } else {
-            handlePaintingTouchesEnded(touchedNodes, location)
-        }
-        
+        handleNonPaintingTouchesEnded(touchedNodes, location)
         controls.gameScene = self
     }
 
@@ -302,12 +277,8 @@ class GameScene: SKScene {
             }
             return
         }
-        
-        if selectedNode.zPosition != -5 {
-            handleNonPaintNodeSelectedEnded(selectedNode)
-        } else {
-            handlePaintNodeSelectedEnded(selectedNode, location)
-        }
+    
+        handleNonPaintNodeSelectedEnded(selectedNode)
     }
 
     func handleNonPaintNodeSelectedEnded(_ selectedNode: SKNode) {
@@ -320,31 +291,6 @@ class GameScene: SKScene {
         }
     }
 
-    func handlePaintNodeSelectedEnded(_ selectedNode: SKNode, _ location: CGPoint) {
-        print("You are selecting a paint node and need to drop instead")
-        
-        if controls.drop && !controls.removeOn && !controls.usingCamGesture {
-            if controls.isPainting {
-                controls.selectedNode = selectedNode
-            } else {
-                let newNode = renderNode(location: location, hasPhysics: true, lastRed: lastRed, lastGreen: lastGreen, lastBlue: lastBlue, letterText: controls.letterText)
-                addChild(newNode)
-                controls.lastNode = newNode
-            }
-        }
-    }
-
-    func handlePaintingTouchesEnded(_ touchedNodes: [SKNode], _ location: CGPoint) {
-        // Handle painting touches based on the painting logic
-        // TODO: Add the appropriate logic for painting touches
-    }
-
-    // TODO: Add any additional helper methods or handle specific cases as needed
-
-    
-    /*
-     
-     */
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         /**
          # summary
@@ -366,11 +312,7 @@ class GameScene: SKScene {
             - handleDraggedErasingPaint
             - handleDraggedPainting
          */
-        if controls.isPainting == false {
-            handleDraggedNonPaintingTouches(touches)
-        } else {
-            handleDraggedPaintingTouches(touches)
-        }
+        handleDraggedNonPaintingTouches(touches)
         controls.gameScene = self
     }
     
@@ -380,8 +322,6 @@ class GameScene: SKScene {
             
             if controls.selectedNodes.count > 0 {
                 handleDraggedPhysicsNode(location)
-            } else if controls.pourOn && !controls.usingCamGesture {
-                handleDraggedPourCode(location)
             }
         }
     }
@@ -392,43 +332,6 @@ class GameScene: SKScene {
             controls.drop = false
         }
     }
-
-    func handleDraggedPourCode(_ location: CGPoint) {
-        if controls.selectedShape != .data || controls.pourOn && !controls.usingCamGesture {
-            let newNode = renderNode(location: location, hasPhysics: true, lastRed: lastRed, lastGreen: lastGreen, lastBlue: lastBlue, letterText: controls.letterText)
-            addChild(newNode)
-            controls.lastNode = newNode
-        }
-    }
-
-    func handleDraggedPaintingTouches(_ touches: Set<UITouch>) {
-        if !controls.usingCamGesture {
-            for touch in touches {
-                let location = touch.location(in: self)
-                let touchedNodes = nodes(at: location)
-                controls.selectedNodes = touchedNodes
-                
-                if touchedNodes.count > 0 && controls.removeOn {
-                    handleDraggedErasingPaint(touchedNodes)
-                } else {
-                    handleDraggedPainting(location)
-                }
-            }
-        }
-    }
-
-    func handleDraggedErasingPaint(_ touchedNodes: [SKNode]) {
-        if touchedNodes[0].zPosition == -5 {
-            controls.selectedNode = touchedNodes[0]
-            controls.selectedNode.removeFromParent()
-        }
-    }
-
-    func handleDraggedPainting(_ location: CGPoint) {
-        let newNode = renderNode(location: location, hasPhysics: false, zPosition: -5, lastRed: lastRed, lastGreen: lastGreen, lastBlue: lastBlue, letterText: controls.letterText)
-        addChild(newNode)
-        controls.lastNode = newNode
-    }
  
     // tap
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -437,11 +340,7 @@ class GameScene: SKScene {
         let location = touch.location(in: self)
         setBackgroundColor()
 
-        if controls.isPainting {
-            handlePaintingTouchesBegan(at: location)
-        } else {
-            handleNonPaintingTouchesBegan(at: location)
-        }
+        handleNonPaintingTouchesBegan(at: location)
 
         controls.gameScene = self
     }
@@ -466,98 +365,6 @@ class GameScene: SKScene {
                 controls.selectedNode.removeFromParent()
             }
         }
-    }
-
-    func handlePaintingTouchesBegan(at location: CGPoint) {
-        let touchedNodes = nodes(at: location)
-        controls.selectedNodes = touchedNodes
-
-        guard touchedNodes.count > 0 else {
-            handlePaintNodeAdditionBegan(at: location)
-            return
-        }
-
-        let selectedNode = touchedNodes[0]
-
-        if Int(selectedNode.zPosition) == -5, controls.removeOn {
-            controls.selectedNode = selectedNode
-            controls.selectedNode.removeFromParent()
-        } else if !controls.usingCamGesture, controls.selectedShape != .data {
-            handlePaintNodeAdditionBegan(at: location)
-        }
-    }
-
-    func handlePaintNodeAdditionBegan(at location: CGPoint) {
-        guard !controls.removeOn, !controls.usingCamGesture, controls.selectedShape != .data else { return }
-
-        let newNode = renderNode(location: location, hasPhysics: false, zPosition: -5, lastRed: lastRed, lastGreen: lastGreen, lastBlue: lastBlue, letterText: controls.letterText)
-        addChild(newNode)
-        controls.lastNode = newNode
-    }
-
-    // TODO: create renderFigShape() and try making a stick figure
-    func renderFigShape(shape: Shape, location: CGPoint, kind: JoinStyle) {
-        /**
-         # summary
-         This code defines a function that takes in a "shape" object, a 2D point for location, and a "JoinStyle" variable "kind".
-         
-         ## description
-         Within the function, it loads a single row of data, chooses a random color for the row, and creates two feature nodes, which are added to the scene as child nodes.
-
-         The two nodes are then joined together using a "spring" joint, and the last node created is stored in a property called "lastNode".
-
-         The rest of the code appears to be commented out for now, meaning it is not currently being executed. It looks like it creates more feature nodes and uses various types of joints to connect them together.
-         */
-        // flow is different since it does a row at a time
-        let (_, scaleData) = controls.loadSingleRow()
-        // choose random color for row
-        let rowColor = Color(red: Double.random(in: 0.0...1.0), green: Double.random(in: 0.0...1.0), blue: Double.random(in: 0.0...1.0))
-        
-        let headNode = createFeatureNodeShape(shape: shape,
-                                              scale: Float(scaleData.Outcome),
-                                              chosenColor: rowColor,
-                                              location: location,
-                                              hasPhysics: true)
-        addChild(headNode)
-        
-        let neckNode = createFeatureNodeShape(shape: shape, scale: Float(scaleData.id), chosenColor: rowColor, location: location, hasPhysics: true)
-        addChild(neckNode)
-        // TODO: temporarily trying head on sliding (it pops off!)
-        pinJoinNodes(nodeA: headNode, nodeB: neckNode, kind: .spring, anchorX: 5.0,  anchorY: -5.0)
-
-        controls.lastNode = neckNode
-        
-//        let chestNode = createFeatureNodeShape(shape: shape, scale: scaleData.Pregnancies, chosenColor: rowColor, location: location, hasPhysics: true)
-//        addChild(chestNode)
-//        pinJoinNodes(nodeA: neckNode, nodeB: chestNode, kind: .pin, anchorY: -1.0)
-//
-//        let leftShoulderNode = createFeatureNodeShape(shape: shape, scale: scaleData.Glucose, chosenColor: rowColor, location: location, hasPhysics: true)
-//        addChild(leftShoulderNode)
-//        pinJoinNodes(nodeA: chestNode, nodeB: leftShoulderNode, kind: .fixed, anchorX: -1.0)
-//
-//        let rightShoulderNode = createFeatureNodeShape(shape: shape, scale: scaleData.BloodPressure, chosenColor: rowColor, location: location, hasPhysics: true)
-//        addChild(rightShoulderNode)
-//        pinJoinNodes(nodeA: chestNode, nodeB: rightShoulderNode, kind: .fixed, anchorX: 1.0)
-//
-//        let rightArmOneNode = createFeatureNodeShape(shape: shape, scale: scaleData.SkinThickness, chosenColor: rowColor, location: location, hasPhysics: true)
-//        addChild(rightArmOneNode)
-//        pinJoinNodes(nodeA: rightShoulderNode, nodeB: rightArmOneNode, kind: .pin, anchorX: 1.0)
-//
-//        let rightArmTwoNode = createFeatureNodeShape(shape: shape, scale: scaleData.Insulin, chosenColor: rowColor, location: location, hasPhysics: true)
-//        addChild(rightArmTwoNode)
-//        pinJoinNodes(nodeA: rightArmOneNode, nodeB: rightArmTwoNode, kind: .pin, anchorX: 1.0)
-//
-//        let rightArmThreeNode = createFeatureNodeShape(shape: shape, scale: scaleData.BMI, chosenColor: rowColor, location: location, hasPhysics: true)
-//        addChild(rightArmThreeNode)
-//        pinJoinNodes(nodeA: rightArmTwoNode, nodeB: rightArmThreeNode, kind: .pin, anchorX: 1.0)
-//
-//        let elbowNode = createFeatureNodeShape(shape: shape, scale: scaleData.DiabetesPedigreeFunction, chosenColor: rowColor, location: location, hasPhysics: true)
-//        addChild(elbowNode)
-//        pinJoinNodes(nodeA: rightArmThreeNode, nodeB: elbowNode, kind: .pin, anchorX: 1.0)
-//
-//        let foreArmOneNode = createFeatureNodeShape(shape: shape, scale: scaleData.Age, chosenColor: rowColor, location: location, hasPhysics: true)
-//        addChild(foreArmOneNode)
-//        pinJoinNodes(nodeA: elbowNode, nodeB: foreArmOneNode, kind: .pin, anchorX: 1.0)
     }
     
     func renderRowShape(shape: Shape, location: CGPoint, kind: JoinStyle) {
