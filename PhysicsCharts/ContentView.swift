@@ -46,13 +46,8 @@ struct ContentView: View {
         let controls = UIJoin.shared
         
         var body: some View {
-//            Text(controls.lastNode.physicsBody?.area.formatted() ?? "0")
-//            Text(controls.lastNode.physicsBody?.angularVelocity.formatted() ?? "0")
-            // TODO: change this to count of nodes in scene
-//            @Binding var nodeCount = controls.nodeCount
             var nodeCount = controls.nodeCount
             Text("Nodes: \(nodeCount)")
-//            Text(controls.lastNode.debugDescription)
         }
     }
     
@@ -85,14 +80,6 @@ struct ContentView: View {
                         .padding()
                 }
                 Spacer()
-                // slider here to adjust jump strength
-                Slider(
-                    value: $jumpStrength,
-                    in: 0...1,
-                    onEditingChanged: { editing in
-                        controls.jumpStrength = jumpStrength
-                    }
-                )
                 Button(action: jumpRight) {
                     Image(systemName: "arrow.up.right.circle")
                         .font(.system(size: 35))
@@ -145,17 +132,13 @@ struct ContentView: View {
                         HStack {
                             VStack {
                                 PickerView()
-                                SizeSliders()
                             }
                             .padding()
                             RGBSliders()
                         }
-                        ToggleButtonRow()
                         PhysicsView()
                         JumpButtons()
                         PlayerStats()
-//                        PhysicsSliders()
-//                        ClearInfoButtons()
                     }
                 }
                 .background(Color(red: lastRed, green: lastGreen, blue: lastBlue, opacity: 0.25))
@@ -293,73 +276,6 @@ struct ContentView: View {
         }
     }
     
-    struct ToggleButtonRow: View {
-        @AppStorage("LastRed") private var lastRed = 0.0
-        @AppStorage("LastGreen") private var lastGreen = 0.43
-        @AppStorage("LastBlue") private var lastBlue = 0.83
-        
-        @State private var letterText = "B"
-        @State public var isPainting = false
-        @State private var staticNode = false
-        @State public var pourOn = false
-        @State public var removeOn = false
-        
-        let controls = UIJoin.shared
-        
-        private func sliderColorRChanged(to newValue: Double) {
-            lastRed = newValue
-        }
-        
-        private func sliderColorGChanged(to newValue: Double) {
-            // save user defaults
-            lastGreen = newValue
-        }
-        
-        private func sliderColorBChanged(to newValue: Double) {
-            lastBlue = newValue
-        }
-        
-        private func addMethodChanged(to newValue: Bool) {
-            controls.isPainting = newValue
-        }
-        
-        var body: some View {
-            HStack {
-                TextField("B", text: $letterText)
-                    .frame(width: 20)
-                    .onSubmit({
-                        controls.letterText = letterText
-                    })
-                // choose how to add/remove shapes to the physics environment
-                // && currentMode == .light
-                Toggle("Paint", isOn: $isPainting)
-                    .toggleStyle(PaintToggleStyle())
-                    .foregroundColor(Color(red: lastRed, green: lastGreen, blue: lastBlue))
-                    .onChange(of: isPainting, perform: addMethodChanged)
-                Toggle("Static", isOn: $staticNode)
-                    .onChange(of: staticNode) { newValue in
-                        controls.staticNode = staticNode
-                    }
-                    .toggleStyle(StaticToggleStyle())
-                    .foregroundColor(Color(red: lastRed, green: lastGreen, blue: lastBlue))
-                Toggle("Pour", isOn: $pourOn)
-                    .toggleStyle(PourToggleStyle())
-                    .foregroundColor(Color(red: lastRed, green: lastGreen, blue: lastBlue))
-                    .onChange(of: pourOn) { newValue in
-                        controls.pourOn = pourOn
-                    }
-                Toggle("Clear", isOn: $removeOn)
-                    .onChange(of: removeOn) { newValue in
-                        controls.removeOn = removeOn
-                    }
-                    .toggleStyle(ClearToggleStyle())
-                    .foregroundColor(Color(red: lastRed, green: lastGreen, blue: lastBlue))
-            }
-            .padding([.bottom, .top], 2)
-            .frame(maxHeight: 52, alignment: .center)
-        }
-    }
-    
     struct RGBSliders: View {
         @AppStorage("LastRed") private var lastRed = 0.0
         @AppStorage("LastGreen") private var lastGreen = 0.43
@@ -473,22 +389,9 @@ struct ContentView: View {
             VStack {
                 Picker("Shape", selection: $selectedShape) {
                     Text("Rectangle").tag(Shape.rectangle)
-                    Text("Circle").tag(Shape.circle)
-                    Text("Triangle").tag(Shape.triangle)
-                    Text("Text").tag(Shape.text)
                     Text("Data").tag(Shape.data)
                 }
                 .onChange(of: selectedShape, perform: shapeChanged)
-             
-                // Baskerville, Chalkduster, Courier, Didot, Menlo
-                Picker("Font", selection: $letterFont) {
-                    Text("Baskerville").tag("Baskerville")
-                    Text("Chalkduster").tag("Chalkduster")
-                    Text("Courier").tag("Courier")
-                    Text("Didot").tag("Didot")
-                    Text("Menlo").tag("Menlo")
-                }
-                .onChange(of: letterFont, perform: fontChanged)
             }
         }
         
@@ -649,10 +552,3 @@ struct ContentView: View {
         }
     }
 }
-
-
-//struct ContentView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
-//    }
-//}

@@ -13,6 +13,7 @@
 		CAC8E4372C2CBEF30057CC67 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CAC8E4362C2CBEF30057CC67 /* Preview Assets.xcassets */; };
 		CAC8E43E2C2CBF870057CC67 /* ObjectSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC8E43D2C2CBF870057CC67 /* ObjectSettings.swift */; };
 		CAC8E4402C2CBFD30057CC67 /* PhysicsEnv.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC8E43F2C2CBFD30057CC67 /* PhysicsEnv.swift */; };
+		CAC8E4422C2E139D0057CC67 /* diabetes.json in Resources */ = {isa = PBXBuildFile; fileRef = CAC8E4412C2E139D0057CC67 /* diabetes.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,6 +24,7 @@
 		CAC8E4362C2CBEF30057CC67 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		CAC8E43D2C2CBF870057CC67 /* ObjectSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectSettings.swift; sourceTree = "<group>"; };
 		CAC8E43F2C2CBFD30057CC67 /* PhysicsEnv.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhysicsEnv.swift; sourceTree = "<group>"; };
+		CAC8E4412C2E139D0057CC67 /* diabetes.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = diabetes.json; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,6 +61,7 @@
 				CAC8E4312C2CBEF10057CC67 /* ContentView.swift */,
 				CAC8E43F2C2CBFD30057CC67 /* PhysicsEnv.swift */,
 				CAC8E43D2C2CBF870057CC67 /* ObjectSettings.swift */,
+				CAC8E4412C2E139D0057CC67 /* diabetes.json */,
 				CAC8E4332C2CBEF30057CC67 /* Assets.xcassets */,
 				CAC8E4352C2CBEF30057CC67 /* Preview Content */,
 			);
@@ -133,6 +136,7 @@
 			files = (
 				CAC8E4372C2CBEF30057CC67 /* Preview Assets.xcassets in Resources */,
 				CAC8E4342C2CBEF30057CC67 /* Assets.xcassets in Resources */,
+				CAC8E4422C2E139D0057CC67 /* diabetes.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

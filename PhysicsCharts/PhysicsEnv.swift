@@ -17,13 +17,6 @@ class GameScene: SKScene {
     @AppStorage("LastGreen") private var lastGreen = 0.43
     @AppStorage("LastBlue") private var lastBlue = 0.83
     
-    // TODO: this is where you'd put the loading code?
-//    let loadedScene = SKScene(fileNamed: "PhysicsWorld")
-//    guard let userData = userData
-//    let scene = userData["backToScene"] as? SKScene
-//   view.presentScene(scene)
-//    @AppStorage("gameScene") = skscene()
-    
     // vars used for camera gestures
     var initialCenter = CGPoint()
     var startX = CGFloat()

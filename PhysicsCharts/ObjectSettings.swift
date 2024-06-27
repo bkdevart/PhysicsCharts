@@ -11,7 +11,7 @@ import UniformTypeIdentifiers  // for svg
 //import Charts
 
 enum Shape: String, CaseIterable, Identifiable {
-    case rectangle, circle, triangle, text, data  // , pomegranite
+    case rectangle, data
     var id: Self { self }
 }
 
@@ -66,12 +66,8 @@ class UIJoin: ObservableObject {
     @Published var letterText = "B"  // used for text shape
     @Published var letterFont = "Menlo"
     
-    // TODO: capture state of entire scene - not codable, deconstruct
     @Published var gameScene = SKScene(fileNamed: "physicsWorld")
     @Published var camera = SKCameraNode()
-    
-    // TODO: capture SwiftUI views in variable here (if possible)
-//    @Published var swiftUIViews = ContentView()
     
     @Published var pima = [Pima]()
     @Published var filteredBMI = [Pima]()
@@ -249,10 +245,6 @@ func createFeatureNodeShape(shape: Shape, scale: Float, chosenColor: Color, loca
         // TODO: this is a hack to satisify requirement of returning node, it's handled in createFeatureNode function - fix
         
         return SKShapeNode()
-        
-    case .text:
-        
-        return SKShapeNode()
 
     case .rectangle:
         // TODO: replace this with SKShapeNode code (try both circle and square)
@@ -281,77 +273,6 @@ func createFeatureNodeShape(shape: Shape, scale: Float, chosenColor: Color, loca
             box.physicsBody?.linearDamping = controls.linearDamping
         }
         return box
-
-    case .circle:
-        let path = CGMutablePath()
-        path.addArc(center: CGPoint.zero,
-                    radius: CGFloat(Int(boxWidth) / 2),
-                    startAngle: 0,
-                    endAngle: CGFloat.pi * 2,
-                    clockwise: true)
-        let ball = SKShapeNode(path: path)
-        ball.fillColor = UIColor(red: UIColor(chosenColor).rgba.red, green: UIColor(chosenColor).rgba.green, blue: UIColor(chosenColor).rgba.blue, alpha: CGFloat(scale))
-        ball.strokeColor = UIColor(chosenColor)
-        ball.position = location
-        ball.zPosition = CGFloat(0)
-        if hasPhysics {
-            ball.physicsBody = SKPhysicsBody(polygonFrom: path)
-            ball.physicsBody?.density = controls.density
-            ball.physicsBody?.isDynamic = !controls.staticNode
-            ball.physicsBody?.linearDamping = controls.linearDamping
-        }
-        return ball
-
-    case .triangle:
-        let path = CGMutablePath()
-        // TODO: for different triangles try two side lengths and an angle, infer 3rd size
-        // center shape around x=0
-        let triangle_half = Int(boxWidth) / 2
-        path.move(to: CGPoint(x: 0, y: Int((0.5 * (3.0.squareRoot() * Double(boxWidth))))))  // triangle top
-        path.addLine(to: CGPoint(x: triangle_half, y: 0))  // bottom right corner
-        path.addLine(to: CGPoint(x: -triangle_half, y: 0))  // bottom left corner
-        path.addLine(to: CGPoint(x: 0, y: Int((0.5 * (3.0.squareRoot() * Double(boxWidth))))))  // back to triangle top (not needed)
-        let triangle = SKShapeNode(path: path)
-        triangle.fillColor = UIColor(red: UIColor(chosenColor).rgba.red, green: UIColor(chosenColor).rgba.green, blue: UIColor(chosenColor).rgba.blue, alpha: CGFloat(scale))
-        triangle.strokeColor = UIColor(chosenColor)
-        triangle.position = location
-        triangle.zPosition = CGFloat(0)
-        if hasPhysics {
-            triangle.physicsBody = SKPhysicsBody(polygonFrom: path)
-            triangle.physicsBody?.density = controls.density
-            triangle.physicsBody?.isDynamic = !controls.staticNode
-            triangle.physicsBody?.linearDamping = controls.linearDamping
-        }
-        return triangle
-        
-//    case .pomegranite:
-//        // TODO: import svg and convert to physics node
-////        guard camera != nil else {return}
-////        guard let svg = UTType("Pomegranate") else { return SKShapeNode()}
-//        guard let svg = UTType("Pomegranate") else { return SKShapeNode()}
-//
-////        let svgImage = SVGKImage(contentsOf: svgFileURL)
-//
-//        for shapeNode in svg.shapes as! [CAShapeLayer] {
-//            let skShapeNode = SKShapeNode(path: shapeNode.path)
-//            skShapeNode.fillColor = shapeNode.fillColor
-//            skShapeNode.strokeColor = shapeNode.strokeColor
-//            skShapeNode.lineWidth = shapeNode.lineWidth
-//            scene.addChild(skShapeNode)
-//        }
-//
-////        let fileData = try Data(contentsOf: svgFileURL)
-//        let fileUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension,
-//                                                             svgFileURL.pathExtension as NSString, nil)?.takeRetainedValue()
-//
-//        if UTTypeConformsTo(fileUTI!, kUTTypeScalableVectorGraphics) {
-//            // file is a valid SVG file
-//        } else {
-//            // file is not a valid SVG file
-//        }
-
-        
-//        return svg
     }
     
 }
@@ -414,28 +335,6 @@ func renderNode(location: CGPoint,
         // TODO: this is a hack to satisify requirement of returning node, it's handled in createFeatureNode function - fix
         
         return SKNode()
-        
-    case .text:
-        // uses label node to place text
-        let myText = SKLabelNode(fontNamed: controls.letterFont)
-        myText.text = letterText
-        myText.fontSize = CGFloat(boxWidth)  // 65, 20
-        myText.fontColor = UIColor(chosenColor)
-//        myText.color = UIColor(red: 0.5, green: 0.5, blue: 0.5, alpha: 1)  // 0, 0, 0
-        myText.position = location
-        if hasPhysics {
-            // TODO: scale physics based on text length
-//            myText.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: boxWidth, height: boxWidth))
-            myText.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: myText.frame.width, height: myText.frame.height))
-            // default density value is 1.0, anything higher is relative to this
-            myText.physicsBody?.density = controls.density
-            // TODO: figure out how to add in mass control while factoring in density
-            
-            // modify static/dynamic property based on toggle
-            myText.physicsBody?.isDynamic = !controls.staticNode
-            myText.physicsBody?.linearDamping = controls.linearDamping
-        }
-        return myText
 
     case .rectangle:
         let path = CGMutablePath()
@@ -460,77 +359,6 @@ func renderNode(location: CGPoint,
             box.physicsBody?.linearDamping = controls.linearDamping
         }
         return box
-
-    case .circle:
-        let path = CGMutablePath()
-        path.addArc(center: CGPoint.zero,
-                    radius: CGFloat(Int(boxWidth) / 2),
-                    startAngle: 0,
-                    endAngle: CGFloat.pi * 2,
-                    clockwise: true)
-        let ball = SKShapeNode(path: path)
-        ball.fillColor = UIColor(chosenColor)
-        ball.strokeColor = UIColor(chosenColor)
-        ball.position = location
-        ball.zPosition = CGFloat(zPosition)
-        if hasPhysics {
-            ball.physicsBody = SKPhysicsBody(polygonFrom: path)
-            ball.physicsBody?.density = controls.density
-            ball.physicsBody?.isDynamic = !controls.staticNode
-            ball.physicsBody?.linearDamping = controls.linearDamping
-        }
-        return ball
-
-    case .triangle:
-        let path = CGMutablePath()
-        // TODO: for different triangles try two side lengths and an angle, infer 3rd size
-        // center shape around x=0
-        let triangle_half = Int(boxWidth) / 2
-        path.move(to: CGPoint(x: 0, y: Int((0.5 * (3.0.squareRoot() * Double(boxWidth))))))  // triangle top
-        path.addLine(to: CGPoint(x: triangle_half, y: 0))  // bottom right corner
-        path.addLine(to: CGPoint(x: -triangle_half, y: 0))  // bottom left corner
-        path.addLine(to: CGPoint(x: 0, y: Int((0.5 * (3.0.squareRoot() * Double(boxWidth))))))  // back to triangle top (not needed)
-        let triangle = SKShapeNode(path: path)
-        triangle.fillColor = UIColor(chosenColor)
-        triangle.strokeColor = UIColor(chosenColor)
-        triangle.position = location
-        triangle.zPosition = CGFloat(zPosition)
-        if hasPhysics {
-            triangle.physicsBody = SKPhysicsBody(polygonFrom: path)
-            triangle.physicsBody?.density = controls.density
-            triangle.physicsBody?.isDynamic = !controls.staticNode
-            triangle.physicsBody?.linearDamping = controls.linearDamping
-        }
-        return triangle
-        
-//    case .pomegranite:
-//        // TODO: import svg and convert to physics node
-////        guard camera != nil else {return}
-////        guard let svg = UTType("Pomegranate") else { return SKShapeNode()}
-//        guard let svg = UTType("Pomegranate") else { return SKShapeNode()}
-//
-////        let svgImage = SVGKImage(contentsOf: svgFileURL)
-//
-//        for shapeNode in svg.shapes as! [CAShapeLayer] {
-//            let skShapeNode = SKShapeNode(path: shapeNode.path)
-//            skShapeNode.fillColor = shapeNode.fillColor
-//            skShapeNode.strokeColor = shapeNode.strokeColor
-//            skShapeNode.lineWidth = shapeNode.lineWidth
-//            scene.addChild(skShapeNode)
-//        }
-//
-////        let fileData = try Data(contentsOf: svgFileURL)
-//        let fileUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension,
-//                                                             svgFileURL.pathExtension as NSString, nil)?.takeRetainedValue()
-//
-//        if UTTypeConformsTo(fileUTI!, kUTTypeScalableVectorGraphics) {
-//            // file is a valid SVG file
-//        } else {
-//            // file is not a valid SVG file
-//        }
-
-        
-//        return svg
     }
 }
 
