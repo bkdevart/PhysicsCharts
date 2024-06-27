@@ -14,8 +14,8 @@
             filePath = "PhysicsCharts/ObjectSettings.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "172"
-            endingLineNumber = "172"
+            startingLineNumber = "175"
+            endingLineNumber = "175"
             landmarkName = "loadData()"
             landmarkType = "7">
          </BreakpointContent>

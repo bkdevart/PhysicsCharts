@@ -83,6 +83,9 @@ class UIJoin: ObservableObject {
     @Published var jumpStrength = 0.25
     @Published var lastNodeSpeed = 0.0
     
+    // data vars
+    @Published var dataOutcome = Float(1.0)
+    
     public func jumpNodeRight() {
         // applyImpulse
         lastNode.physicsBody?.applyImpulse(CGVector(dx: 10 * jumpStrength, dy: 30 * jumpStrength))
@@ -347,14 +350,16 @@ func renderNode(location: CGPoint,
             }
         }
         
-        // scale rectangle around outcome counts (must pick larger count, statically setting to 0 for now)
         boxWidth = boxWidth / 3
-        let totalOutcome1Ratio = (Float(totalOutcome1) / Float(controls.pima.count)) * Float(controls.screenHeight)
-        
-        boxHeight = Int(totalOutcome1Ratio)
-        print(totalOutcome1Ratio)
-        
+        // scale rectangle around outcome counts
+        if controls.dataOutcome == 1.0 {
+            boxHeight = Int((Float(totalOutcome1) / Float(controls.pima.count)) * Float(controls.screenHeight))
+        } else {
+            boxHeight = Int((Float(totalOutcome0) / Float(controls.pima.count)) * Float(controls.screenHeight))
+        }
+
         let box = renderBox(boxWidth: boxWidth, boxHeight: boxHeight, chosenColor: chosenColor, location: location, zPosition: zPosition)
+        
         return box
 
     case .rectangle:

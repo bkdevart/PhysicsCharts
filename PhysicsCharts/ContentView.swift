@@ -125,6 +125,10 @@ struct ContentView: View {
         @AppStorage("LastGreen") private var lastGreen = 0.43
         @AppStorage("LastBlue") private var lastBlue = 0.83
         
+        let controls = UIJoin.shared
+        
+        @State private var outcome = 1.0
+        
         var body: some View {
             NavigationView {
                 Group {
@@ -132,6 +136,14 @@ struct ContentView: View {
                         HStack {
                             VStack {
                                 PickerView()
+                                VStack {
+                                    Text("Outcome: \(String(format: "%.f", outcome))")
+                                    Slider(value: $outcome, in: 0...1, step: 1)
+                                        .onChange(of: outcome) { _ in
+                                            // TODO: log value in shared variable to be read by render methods
+                                            controls.dataOutcome = Float(outcome)
+                                        }
+                                }
                             }
                             .padding()
                             RGBSliders()
