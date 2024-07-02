@@ -40,7 +40,7 @@ struct Pima: Codable, Identifiable {
 
 // using this to track box size and color selection across views
 class UIJoin: ObservableObject {
-    @Published var selectedShape: Shape = .rectangle
+    @Published var selectedShape: Shape = .data
     @Published var screenWidth: CGFloat = 428.0
     @Published var screenHeight: CGFloat = 428.0
     @Published var boxHeight = 6.0

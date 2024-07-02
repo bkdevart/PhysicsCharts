@@ -30,7 +30,7 @@ struct ContentView: View {
     let controls = UIJoin.shared
 
     // houses shape picker selection
-    @State private var selectedShape: Shape = .rectangle
+    @State private var selectedShape: Shape = .data
     @State public var removeOn = false
     @State public var pourOn = false
     @State public var isPainting = false
@@ -392,7 +392,7 @@ struct ContentView: View {
     
     struct PickerView: View {
         // this view has shape and font dropdowns
-        @State private var selectedShape: Shape = .rectangle
+        @State private var selectedShape: Shape = .data
         @State private var letterFont = "Menlo"
         
         let controls = UIJoin.shared
@@ -400,8 +400,8 @@ struct ContentView: View {
         var body: some View {
             VStack {
                 Picker("Shape", selection: $selectedShape) {
-                    Text("Rectangle").tag(Shape.rectangle)
                     Text("Data").tag(Shape.data)
+                    Text("Rectangle").tag(Shape.rectangle)
                 }
                 .onChange(of: selectedShape, perform: shapeChanged)
             }
@@ -411,7 +411,7 @@ struct ContentView: View {
             controls.selectedShape = newValue
             // TODO: if data, load data
             if newValue == .data {
-                controls.loadData()
+//                controls.loadData()
             }
         }
         
@@ -555,7 +555,10 @@ struct ContentView: View {
     var body: some View {
         if horizontalSizeClass == .compact {
             IOSView()
-                .onAppear(perform: {controls.playMode = false})
+                .onAppear(perform: {
+                    controls.playMode = false
+                    controls.loadData()
+                })
         } else {
             // ipad view - fix IOSView
             IOSView()
