@@ -136,14 +136,6 @@ struct ContentView: View {
                         HStack {
                             VStack {
                                 PickerView()
-                                VStack {
-                                    Text("Outcome: \(String(format: "%.f", outcome))")
-                                    Slider(value: $outcome, in: 0...1, step: 1)
-                                        .onChange(of: outcome) { _ in
-                                            // TODO: log value in shared variable to be read by render methods
-                                            controls.dataOutcome = Float(outcome)
-                                        }
-                                }
                             }
                             .padding()
                             RGBSliders()

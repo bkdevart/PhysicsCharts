@@ -271,9 +271,26 @@ class GameScene: SKScene {
             controls.drop = true
             // don't drop if erasing
             if !controls.removeOn && controls.drop != false {
-                let newNode = renderNode(location: location, hasPhysics: true, lastRed: lastRed, lastGreen: lastGreen, lastBlue: lastBlue, letterText: controls.letterText)
-                addChild(newNode)
-                controls.lastNode = newNode
+                if controls.selectedShape == .data {
+                    // make negative outcome bar
+                    controls.dataOutcome = 0.0
+                    let spaceApart = 20.0 / 2
+                    let node1Location = CGPoint(x: location.x - spaceApart, y: location.y)
+                    let newNode1 = renderNode(location: node1Location, hasPhysics: true, lastRed: lastRed, lastGreen: lastGreen, lastBlue: lastBlue, letterText: controls.letterText)
+                    addChild(newNode1)
+                    // make positive outcome bar
+                    controls.dataOutcome = 1.0
+                    let node2Location = CGPoint(x: location.x + spaceApart, y: location.y)
+                    let newNode2 = renderNode(location: node2Location, hasPhysics: true, lastRed: lastRed, lastGreen: lastGreen, lastBlue: lastBlue, letterText: controls.letterText)
+                    
+                    addChild(newNode2)
+                    controls.lastNode = newNode2
+                } else {
+                    let newNode = renderNode(location: location, hasPhysics: true, lastRed: lastRed, lastGreen: lastGreen, lastBlue: lastBlue, letterText: controls.letterText)
+                    
+                    addChild(newNode)
+                    controls.lastNode = newNode
+                }
             }
             return
         }
