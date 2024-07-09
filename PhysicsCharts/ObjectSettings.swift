@@ -11,7 +11,7 @@ import UniformTypeIdentifiers  // for svg
 //import Charts
 
 enum Shape: String, CaseIterable, Identifiable {
-    case rectangle, data
+    case rectangle, data, scale
     var id: Self { self }
 }
 
@@ -233,6 +233,10 @@ func createFeatureNodeShape(shape: Shape, scale: Float, chosenColor: Color, loca
     let boxHeight = Int(((controls.boxHeight) / 100.0) * Double(controls.scalePixels))
     
     switch shape {
+    case .scale:
+        // TODO: this is a hack to satisify requirement of returning node, it's handled in createFeatureNode function - fix
+        return SKShapeNode()
+
     case .data:
         // TODO: this is a hack to satisify requirement of returning node, it's handled in createFeatureNode function - fix
         return SKShapeNode()
@@ -316,6 +320,28 @@ func renderBox(boxWidth: Int, boxHeight: Int, chosenColor: Color, location: CGPo
     return box
 }
 
+func renderWeightScale(at location: CGPoint) -> (SKShapeNode, SKShapeNode) {
+    // Create the horizontal line (the plank of the seesaw)
+    let plank = SKShapeNode(rectOf: CGSize(width: 200, height: 10))
+    plank.position = location
+    plank.fillColor = .brown
+//    addChild(plank)
+    
+    // Create the triangle (the base of the seesaw)
+    let trianglePath = CGMutablePath()
+    trianglePath.move(to: CGPoint(x: -50, y: 0))
+    trianglePath.addLine(to: CGPoint(x: 50, y: 0))
+    trianglePath.addLine(to: CGPoint(x: 0, y: -50))
+    trianglePath.closeSubpath()
+    
+    let triangle = SKShapeNode(path: trianglePath)
+    triangle.position = CGPoint(x: location.x, y: location.y - 30)
+    triangle.fillColor = .gray
+//    addChild(triangle)
+    
+    return (plank, triangle)
+}
+
 func renderNode(location: CGPoint,
                 hasPhysics: Bool=false,
                 zPosition: Int=0,
@@ -336,6 +362,11 @@ func renderNode(location: CGPoint,
     
     controls.selectedNode = SKNode()
     switch controls.selectedShape {
+    case .scale:
+        // TODO: fix this
+//        return renderWeightScale[0]
+        return SKNode()
+        
     case .data:
         // TODO: process data and stack all 768 datapoints
         // sum up counts of each outcome, make hight of rectangle based on this, drop two rectangles

@@ -285,6 +285,25 @@ class GameScene: SKScene {
                     
                     addChild(newNode2)
                     controls.lastNode = newNode2
+                } else if controls.selectedShape == .scale {
+                    let plank = SKShapeNode(rectOf: CGSize(width: 200, height: 10))
+                    plank.position = location
+                    plank.fillColor = .brown
+                    plank.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: 200, height: 10))
+                    addChild(plank)
+                    
+                    // Create the triangle (the base of the seesaw)
+                    let trianglePath = CGMutablePath()
+                    trianglePath.move(to: CGPoint(x: -50, y: 0))
+                    trianglePath.addLine(to: CGPoint(x: 50, y: 0))
+                    trianglePath.addLine(to: CGPoint(x: 0, y: 50)) // Flip the y-coordinate
+                    trianglePath.closeSubpath()
+                    
+                    let triangle = SKShapeNode(path: trianglePath)
+                    triangle.position = CGPoint(x: location.x, y: location.y - 55)
+                    triangle.fillColor = .gray
+                    triangle.physicsBody = SKPhysicsBody(polygonFrom: trianglePath)
+                    addChild(triangle)
                 } else {
                     let newNode = renderNode(location: location, hasPhysics: true, lastRed: lastRed, lastGreen: lastGreen, lastBlue: lastBlue, letterText: controls.letterText)
                     
@@ -383,6 +402,26 @@ class GameScene: SKScene {
             }
         }
     }
+    
+//    func renderWeightScale(at location: CGPoint) {
+//        // Create the horizontal line (the plank of the seesaw)
+//        let plank = SKShapeNode(rectOf: CGSize(width: 200, height: 10))
+//        plank.position = CGPoint(x: frame.midX, y: frame.midY)
+//        plank.fillColor = .brown
+//        addChild(plank)
+//        
+//        // Create the triangle (the base of the seesaw)
+//        let trianglePath = CGMutablePath()
+//        trianglePath.move(to: CGPoint(x: -50, y: 0))
+//        trianglePath.addLine(to: CGPoint(x: 50, y: 0))
+//        trianglePath.addLine(to: CGPoint(x: 0, y: -50))
+//        trianglePath.closeSubpath()
+//        
+//        let triangle = SKShapeNode(path: trianglePath)
+//        triangle.position = CGPoint(x: frame.midX, y: frame.midY - 30)
+//        triangle.fillColor = .gray
+//        addChild(triangle)
+//    }
     
     func renderRowShape(shape: Shape, location: CGPoint, kind: JoinStyle) {
         /**

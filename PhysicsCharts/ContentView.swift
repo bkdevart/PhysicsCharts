@@ -394,6 +394,7 @@ struct ContentView: View {
                 Picker("Shape", selection: $selectedShape) {
                     Text("Data").tag(Shape.data)
                     Text("Rectangle").tag(Shape.rectangle)
+                    Text("Scale").tag(Shape.scale)
                 }
                 .onChange(of: selectedShape, perform: shapeChanged)
             }
@@ -404,6 +405,8 @@ struct ContentView: View {
             // TODO: if data, load data
             if newValue == .data {
 //                controls.loadData()
+            } else if newValue == .scale {
+                // TODO: call function to drop weight in middle of screen
             }
         }
         
