@@ -274,7 +274,7 @@ class GameScene: SKScene {
                 if controls.selectedShape == .data {
                     // make negative outcome bar
                     controls.dataOutcome = 0.0
-                    let spaceApart = 20.0 / 2
+                    let spaceApart = 50.0 / 2
                     let node1Location = CGPoint(x: location.x - spaceApart, y: location.y)
                     let newNode1 = renderNode(location: node1Location, hasPhysics: true, lastRed: lastRed, lastGreen: lastGreen, lastBlue: lastBlue, letterText: controls.letterText)
                     addChild(newNode1)
@@ -282,13 +282,13 @@ class GameScene: SKScene {
                     controls.dataOutcome = 1.0
                     let node2Location = CGPoint(x: location.x + spaceApart, y: location.y)
                     let newNode2 = renderNode(location: node2Location, hasPhysics: true, lastRed: lastRed, lastGreen: lastGreen, lastBlue: lastBlue, letterText: controls.letterText)
-                    
                     addChild(newNode2)
                     controls.lastNode = newNode2
                 } else if controls.selectedShape == .scale {
                     let plank = SKShapeNode(rectOf: CGSize(width: 200, height: 10))
                     plank.position = location
-                    plank.fillColor = .brown
+                    plank.strokeColor = SKColor(red: lastRed, green: lastGreen, blue: lastBlue, alpha: 1.0)
+                    plank.fillColor = SKColor(red: lastRed, green: lastGreen, blue: lastBlue, alpha: 1.0)
                     plank.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: 200, height: 10))
                     addChild(plank)
                     
@@ -301,7 +301,8 @@ class GameScene: SKScene {
                     
                     let triangle = SKShapeNode(path: trianglePath)
                     triangle.position = CGPoint(x: location.x, y: location.y - 55)
-                    triangle.fillColor = .gray
+                    triangle.strokeColor = SKColor(red: lastRed, green: lastGreen, blue: lastBlue, alpha: 0.75)
+                    triangle.fillColor = SKColor(red: lastRed, green: lastGreen, blue: lastBlue, alpha: 0.75)
                     triangle.physicsBody = SKPhysicsBody(polygonFrom: trianglePath)
                     addChild(triangle)
                 } else {
