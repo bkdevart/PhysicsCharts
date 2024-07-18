@@ -263,6 +263,58 @@ class GameScene: SKScene {
         handleNonPaintingTouchesEnded(touchedNodes, location)
         controls.gameScene = self
     }
+    
+    func renderBarChart(_ location: CGPoint) {
+        // make negative outcome bar
+        controls.dataOutcome = 0.0
+        let spaceApart = 50.0 / 2
+        let node1Location = CGPoint(x: location.x - spaceApart, y: location.y)
+        let newNode1 = renderNode(location: node1Location, hasPhysics: true, lastRed: lastRed, lastGreen: lastGreen, lastBlue: lastBlue, letterText: controls.letterText)
+        addChild(newNode1)
+        // make positive outcome bar
+        controls.dataOutcome = 1.0
+        let node2Location = CGPoint(x: location.x + spaceApart, y: location.y)
+        let newNode2 = renderNode(location: node2Location, hasPhysics: true, lastRed: lastRed, lastGreen: lastGreen, lastBlue: lastBlue, letterText: controls.letterText)
+        addChild(newNode2)
+        controls.lastNode = newNode2
+    }
+    
+    func renderScale(_ location: CGPoint) {
+        let plank = SKShapeNode(rectOf: CGSize(width: 200, height: 10))
+        plank.position = location
+        plank.strokeColor = SKColor(red: lastRed, green: lastGreen, blue: lastBlue, alpha: 1.0)
+        plank.fillColor = SKColor(red: lastRed, green: lastGreen, blue: lastBlue, alpha: 1.0)
+        plank.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: 200, height: 10))
+        addChild(plank)
+        
+        // Create the triangle (the base of the seesaw)
+        let trianglePath = CGMutablePath()
+        trianglePath.move(to: CGPoint(x: -50, y: 0))
+        trianglePath.addLine(to: CGPoint(x: 50, y: 0))
+        trianglePath.addLine(to: CGPoint(x: 0, y: 50)) // Flip the y-coordinate
+        trianglePath.closeSubpath()
+        
+        let triangle = SKShapeNode(path: trianglePath)
+        triangle.position = CGPoint(x: location.x, y: location.y - 55)
+        triangle.strokeColor = SKColor(red: lastRed, green: lastGreen, blue: lastBlue, alpha: 0.75)
+        triangle.fillColor = SKColor(red: lastRed, green: lastGreen, blue: lastBlue, alpha: 0.75)
+        triangle.physicsBody = SKPhysicsBody(polygonFrom: trianglePath)
+        addChild(triangle)
+        
+        let spotAboveScale = CGPoint(x: location.x, y: (location.y + 60))
+        controls.dataOutcome = 0.0
+        let spaceApart = 50.0 / 2
+        let node1Location = CGPoint(x: spotAboveScale.x - spaceApart, y: spotAboveScale.y)
+        // TODO: renderNode needs to mimic .data case
+        let newNode1 = renderNode(location: node1Location, hasPhysics: true, lastRed: lastRed, lastGreen: lastGreen, lastBlue: lastBlue, letterText: controls.letterText)
+        addChild(newNode1)
+        // make positive outcome bar
+        controls.dataOutcome = 1.0
+        let node2Location = CGPoint(x: spotAboveScale.x + spaceApart, y: spotAboveScale.y)
+        let newNode2 = renderNode(location: node2Location, hasPhysics: true, lastRed: lastRed, lastGreen: lastGreen, lastBlue: lastBlue, letterText: controls.letterText)
+        addChild(newNode2)
+        controls.lastNode = newNode2
+    }
 
     func handleNonPaintingTouchesEnded(_ touchedNodes: [SKNode], _ location: CGPoint) {
         controls.selectedNodes = touchedNodes
@@ -272,39 +324,11 @@ class GameScene: SKScene {
             // don't drop if erasing
             if !controls.removeOn && controls.drop != false {
                 if controls.selectedShape == .data {
-                    // make negative outcome bar
-                    controls.dataOutcome = 0.0
-                    let spaceApart = 50.0 / 2
-                    let node1Location = CGPoint(x: location.x - spaceApart, y: location.y)
-                    let newNode1 = renderNode(location: node1Location, hasPhysics: true, lastRed: lastRed, lastGreen: lastGreen, lastBlue: lastBlue, letterText: controls.letterText)
-                    addChild(newNode1)
-                    // make positive outcome bar
-                    controls.dataOutcome = 1.0
-                    let node2Location = CGPoint(x: location.x + spaceApart, y: location.y)
-                    let newNode2 = renderNode(location: node2Location, hasPhysics: true, lastRed: lastRed, lastGreen: lastGreen, lastBlue: lastBlue, letterText: controls.letterText)
-                    addChild(newNode2)
-                    controls.lastNode = newNode2
+                    renderBarChart(location)
                 } else if controls.selectedShape == .scale {
-                    let plank = SKShapeNode(rectOf: CGSize(width: 200, height: 10))
-                    plank.position = location
-                    plank.strokeColor = SKColor(red: lastRed, green: lastGreen, blue: lastBlue, alpha: 1.0)
-                    plank.fillColor = SKColor(red: lastRed, green: lastGreen, blue: lastBlue, alpha: 1.0)
-                    plank.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: 200, height: 10))
-                    addChild(plank)
-                    
-                    // Create the triangle (the base of the seesaw)
-                    let trianglePath = CGMutablePath()
-                    trianglePath.move(to: CGPoint(x: -50, y: 0))
-                    trianglePath.addLine(to: CGPoint(x: 50, y: 0))
-                    trianglePath.addLine(to: CGPoint(x: 0, y: 50)) // Flip the y-coordinate
-                    trianglePath.closeSubpath()
-                    
-                    let triangle = SKShapeNode(path: trianglePath)
-                    triangle.position = CGPoint(x: location.x, y: location.y - 55)
-                    triangle.strokeColor = SKColor(red: lastRed, green: lastGreen, blue: lastBlue, alpha: 0.75)
-                    triangle.fillColor = SKColor(red: lastRed, green: lastGreen, blue: lastBlue, alpha: 0.75)
-                    triangle.physicsBody = SKPhysicsBody(polygonFrom: trianglePath)
-                    addChild(triangle)
+                    renderScale(location)
+//                    let spotAboveScale = CGPoint(x: location.x, y: location.y)
+//                    renderBarChart(location)
                 } else {
                     let newNode = renderNode(location: location, hasPhysics: true, lastRed: lastRed, lastGreen: lastGreen, lastBlue: lastBlue, letterText: controls.letterText)
                     

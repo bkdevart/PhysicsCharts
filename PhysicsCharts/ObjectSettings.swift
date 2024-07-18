@@ -342,6 +342,93 @@ func renderWeightScale(at location: CGPoint) -> (SKShapeNode, SKShapeNode) {
     return (plank, triangle)
 }
 
+func renderBar(location: CGPoint,
+                hasPhysics: Bool=false,
+                zPosition: Int=0,
+                lastRed: Double,
+                lastGreen: Double,
+                lastBlue: Double,
+                letterText: String) -> SKNode {
+    // TODO: process data and stack all 768 datapoints
+    @ObservedObject var controls = UIJoin.shared
+    controls.nodeCount += 1
+    // user can choose height and width
+    var boxWidth = Int((controls.boxWidth / 100.0) * Double(controls.scalePixels))
+    var boxHeight = Int((controls.boxHeight / 100.0) * Double(controls.scalePixels))
+    // each color betwen 0 and 1 (based on slider)
+    let chosenColor: Color = Color(red: lastRed,
+                                   green: lastGreen,
+                                   blue: lastBlue)
+    // sum up counts of each outcome, make hight of rectangle based on this, drop two rectangles
+    var totalOutcome1 = 0
+    var totalOutcome0 = 0
+
+    for patient in controls.pima {
+        if patient.Outcome == 1 {
+            totalOutcome1 += 1
+        } else if patient.Outcome == 0 {
+            totalOutcome0 += 1
+        }
+    }
+    
+    boxWidth = boxWidth / 3
+    // scale rectangle around outcome counts
+    if controls.dataOutcome == 1.0 {
+        boxHeight = Int((Float(totalOutcome1) / Float(controls.pima.count)) * Float(controls.screenHeight))
+    } else {
+        boxHeight = Int((Float(totalOutcome0) / Float(controls.pima.count)) * Float(controls.screenHeight))
+    }
+
+    let box = renderBox(boxWidth: boxWidth, boxHeight: boxHeight, chosenColor: chosenColor, location: location, zPosition: zPosition)
+    
+    return box
+}
+
+func renderBars(location: CGPoint,
+                hasPhysics: Bool=false,
+                zPosition: Int=0,
+                lastRed: Double,
+                lastGreen: Double,
+                lastBlue: Double,
+                letterText: String) -> SKNode {
+    // TODO: process data and stack all 768 datapoints
+    @ObservedObject var controls = UIJoin.shared
+    
+    controls.nodeCount += 1
+    // user can choose height and width
+    var boxWidth = Int((controls.boxWidth / 100.0) * Double(controls.scalePixels))
+    var boxHeight = Int((controls.boxHeight / 100.0) * Double(controls.scalePixels))
+    // each color betwen 0 and 1 (based on slider)
+    let chosenColor: Color = Color(red: lastRed,
+                                   green: lastGreen,
+                                   blue: lastBlue)
+    
+    controls.selectedNode = SKNode()
+    // sum up counts of each outcome, make hight of rectangle based on this, drop two rectangles
+    var totalOutcome1 = 0
+    var totalOutcome0 = 0
+
+    for patient in controls.pima {
+        if patient.Outcome == 1 {
+            totalOutcome1 += 1
+        } else if patient.Outcome == 0 {
+            totalOutcome0 += 1
+        }
+    }
+    
+    boxWidth = boxWidth / 3
+    // scale rectangle around outcome counts
+    if controls.dataOutcome == 1.0 {
+        boxHeight = Int((Float(totalOutcome1) / Float(controls.pima.count)) * Float(controls.screenHeight))
+    } else {
+        boxHeight = Int((Float(totalOutcome0) / Float(controls.pima.count)) * Float(controls.screenHeight))
+    }
+
+    let box = renderBox(boxWidth: boxWidth, boxHeight: boxHeight, chosenColor: chosenColor, location: location, zPosition: zPosition)
+    
+    return box
+}
+
 func renderNode(location: CGPoint,
                 hasPhysics: Bool=false,
                 zPosition: Int=0,
@@ -365,33 +452,11 @@ func renderNode(location: CGPoint,
     case .scale:
         // TODO: fix this
 //        return renderWeightScale[0]
-        return SKNode()
+//        return SKNode()
+        return renderBars(location: location, lastRed: lastRed, lastGreen: lastGreen, lastBlue: lastBlue, letterText: letterText)
         
     case .data:
-        // TODO: process data and stack all 768 datapoints
-        // sum up counts of each outcome, make hight of rectangle based on this, drop two rectangles
-        var totalOutcome1 = 0
-        var totalOutcome0 = 0
-
-        for patient in controls.pima {
-            if patient.Outcome == 1 {
-                totalOutcome1 += 1
-            } else if patient.Outcome == 0 {
-                totalOutcome0 += 1
-            }
-        }
-        
-        boxWidth = boxWidth / 3
-        // scale rectangle around outcome counts
-        if controls.dataOutcome == 1.0 {
-            boxHeight = Int((Float(totalOutcome1) / Float(controls.pima.count)) * Float(controls.screenHeight))
-        } else {
-            boxHeight = Int((Float(totalOutcome0) / Float(controls.pima.count)) * Float(controls.screenHeight))
-        }
-
-        let box = renderBox(boxWidth: boxWidth, boxHeight: boxHeight, chosenColor: chosenColor, location: location, zPosition: zPosition)
-        
-        return box
+        return renderBars(location: location, lastRed: lastRed, lastGreen: lastGreen, lastBlue: lastBlue, letterText: letterText)
 
     case .rectangle:
         let box = renderBox(boxWidth: boxWidth, boxHeight: boxHeight, chosenColor: chosenColor, location: location, zPosition: zPosition)
