@@ -440,8 +440,8 @@ func renderNode(location: CGPoint,
     
     controls.nodeCount += 1
     // user can choose height and width
-    var boxWidth = Int((controls.boxWidth / 100.0) * Double(controls.scalePixels))
-    var boxHeight = Int((controls.boxHeight / 100.0) * Double(controls.scalePixels))
+    let boxWidth = Int((controls.boxWidth / 100.0) * Double(controls.scalePixels))
+    let boxHeight = Int((controls.boxHeight / 100.0) * Double(controls.scalePixels))
     // each color betwen 0 and 1 (based on slider)
     let chosenColor: Color = Color(red: lastRed,
                                    green: lastGreen,
@@ -450,9 +450,7 @@ func renderNode(location: CGPoint,
     controls.selectedNode = SKNode()
     switch controls.selectedShape {
     case .scale:
-        // TODO: fix this
-//        return renderWeightScale[0]
-//        return SKNode()
+        // note: scale is rendered before renderBars executes
         return renderBars(location: location, lastRed: lastRed, lastGreen: lastGreen, lastBlue: lastBlue, letterText: letterText)
         
     case .data:

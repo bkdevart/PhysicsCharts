@@ -267,7 +267,7 @@ class GameScene: SKScene {
     func renderBarChart(_ location: CGPoint) {
         // make negative outcome bar
         controls.dataOutcome = 0.0
-        let spaceApart = 50.0 / 2
+        let spaceApart = 75.0 / 2
         let node1Location = CGPoint(x: location.x - spaceApart, y: location.y)
         let newNode1 = renderNode(location: node1Location, hasPhysics: true, lastRed: lastRed, lastGreen: lastGreen, lastBlue: lastBlue, letterText: controls.letterText)
         addChild(newNode1)
@@ -301,19 +301,9 @@ class GameScene: SKScene {
         triangle.physicsBody = SKPhysicsBody(polygonFrom: trianglePath)
         addChild(triangle)
         
+        // place bar chart above scale to weigh classes
         let spotAboveScale = CGPoint(x: location.x, y: (location.y + 60))
-        controls.dataOutcome = 0.0
-        let spaceApart = 50.0 / 2
-        let node1Location = CGPoint(x: spotAboveScale.x - spaceApart, y: spotAboveScale.y)
-        // TODO: renderNode needs to mimic .data case
-        let newNode1 = renderNode(location: node1Location, hasPhysics: true, lastRed: lastRed, lastGreen: lastGreen, lastBlue: lastBlue, letterText: controls.letterText)
-        addChild(newNode1)
-        // make positive outcome bar
-        controls.dataOutcome = 1.0
-        let node2Location = CGPoint(x: spotAboveScale.x + spaceApart, y: spotAboveScale.y)
-        let newNode2 = renderNode(location: node2Location, hasPhysics: true, lastRed: lastRed, lastGreen: lastGreen, lastBlue: lastBlue, letterText: controls.letterText)
-        addChild(newNode2)
-        controls.lastNode = newNode2
+        renderBarChart(spotAboveScale)
     }
 
     func handleNonPaintingTouchesEnded(_ touchedNodes: [SKNode], _ location: CGPoint) {
@@ -326,9 +316,8 @@ class GameScene: SKScene {
                 if controls.selectedShape == .data {
                     renderBarChart(location)
                 } else if controls.selectedShape == .scale {
+                    // also renders bar chart above scale
                     renderScale(location)
-//                    let spotAboveScale = CGPoint(x: location.x, y: location.y)
-//                    renderBarChart(location)
                 } else {
                     let newNode = renderNode(location: location, hasPhysics: true, lastRed: lastRed, lastGreen: lastGreen, lastBlue: lastBlue, letterText: controls.letterText)
                     
@@ -386,11 +375,25 @@ class GameScene: SKScene {
             }
         }
     }
+    
+    func breakBars() {
+        // TODO: get length of selected bar (prone to error if not bar shape selected, add in a check later)
+        
+        // TODO: remove original bar
+        
+        // TODO: create a loop the same length as bar, which calls a box render method using 1 pixel and same width as bar, stacking each above each other
+        
+    }
 
     func handleDraggedPhysicsNode(_ location: CGPoint) {
         if controls.selectedNode.zPosition != -5 {
-            controls.selectedNode.position = location
-            controls.drop = false
+            if controls.selectedShape == .data {
+                // break bar chart into individual components
+                breakBars()
+            } else {
+                controls.selectedNode.position = location
+                controls.drop = false
+            }
         }
     }
  
